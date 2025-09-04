@@ -57,6 +57,30 @@ export async function POST(request: NextRequest) {
     // Create slug from title
     const slug = createSlug(title)
 
+    // Upload torrent file to Supabase Storage
+    const fileName = `${slug}-${Date.now()}.torrent`
+    const fileBuffer = await file.arrayBuffer()
+    
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('torrent-files')
+      .upload(fileName, fileBuffer, {
+        contentType: 'application/x-bittorrent',
+        cacheControl: '3600'
+      })
+
+    if (uploadError) {
+      console.error('File upload error:', uploadError)
+      return NextResponse.json(
+        { error: 'Failed to upload torrent file to storage' },
+        { status: 500 }
+      )
+    }
+
+    // Get the public URL for the uploaded file
+    const { data: publicUrlData } = supabase.storage
+      .from('torrent-files')
+      .getPublicUrl(fileName)
+
     // Use anonymous user for uploads until authentication is implemented
     const { data: anonymousUser } = await supabase
       .from('users')
@@ -84,6 +108,7 @@ export async function POST(request: NextRequest) {
         file_size: parsedTorrent.totalSize,
         piece_length: parsedTorrent.pieceLength,
         magnet_link: parsedTorrent.magnetLink,
+        torrent_file_path: publicUrlData.publicUrl,
         metadata: {
           files: parsedTorrent.files,
           announce: parsedTorrent.announce,
