@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Download, Upload, Star, TrendingUp, Zap } from 'lucide-react'
+import { ArrowRight, Download, Upload, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -67,7 +67,7 @@ export default async function Home() {
               Browse by Category
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Discover apps organized by Apple's official macOS categories
+              Discover apps organized by Apple&apos;s official macOS categories
             </p>
           </div>
           

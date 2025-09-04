@@ -130,11 +130,17 @@ function sendError(message: string) {
   })
 }
 
-function buildAnnounceResponse(data: any, compact: boolean = false) {
+function buildAnnounceResponse(data: {
+  interval: number
+  'min interval': number
+  complete: number
+  incomplete: number
+  peers: Array<{ peer_id: string; ip_address: string; port: number }>
+}, compact: boolean = false) {
   if (compact) {
     // Compact format: concatenated 6-byte strings (4 bytes IP + 2 bytes port)
     const peersBinary = Buffer.concat(
-      data.peers.map((peer: any) => {
+      data.peers.map((peer) => {
         const ip = peer.ip_address.split('.').map((octet: string) => parseInt(octet))
         const port = peer.port
         return Buffer.from([...ip, port >> 8, port & 0xFF])
@@ -150,7 +156,7 @@ function buildAnnounceResponse(data: any, compact: boolean = false) {
     })
   } else {
     // Dictionary format
-    const peersDict = data.peers.map((peer: any) => ({
+    const peersDict = data.peers.map((peer) => ({
       'peer id': peer.peer_id,
       ip: peer.ip_address,
       port: peer.port
@@ -189,7 +195,7 @@ function getClientIP(request: NextRequest): string {
   return '127.0.0.1'
 }
 
-function bencode(data: any): string {
+function bencode(data: unknown): string {
   // Simple bencode implementation
   if (typeof data === 'string') {
     return `${data.length}:${data}`

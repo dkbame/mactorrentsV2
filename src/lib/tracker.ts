@@ -1,6 +1,6 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http'
 import { parse } from 'url'
-import { createHash, randomBytes } from 'crypto'
+import { createHash } from 'crypto'
 import { createServerSupabaseClient } from './supabase'
 
 interface Peer {
@@ -64,7 +64,7 @@ export class TorrentTracker {
     }
   }
 
-  private async handleAnnounce(req: IncomingMessage, res: ServerResponse, query: any) {
+  private async handleAnnounce(req: IncomingMessage, res: ServerResponse, query: Record<string, string | string[]>) {
     // Validate required parameters
     const requiredParams = ['info_hash', 'peer_id', 'port', 'uploaded', 'downloaded', 'left']
     for (const param of requiredParams) {
@@ -163,7 +163,7 @@ export class TorrentTracker {
     }
   }
 
-  private async handleScrape(req: IncomingMessage, res: ServerResponse, query: any) {
+  private async handleScrape(req: IncomingMessage, res: ServerResponse, query: Record<string, string | string[]>) {
     const infoHashes = Array.isArray(query.info_hash) ? query.info_hash : [query.info_hash]
     
     if (!infoHashes[0]) {
@@ -251,11 +251,17 @@ export class TorrentTracker {
     res.end(response)
   }
 
-  private buildAnnounceResponse(data: any, compact: boolean = false) {
+  private buildAnnounceResponse(data: {
+    interval: number
+    'min interval': number
+    complete: number
+    incomplete: number
+    peers: Array<{ peer_id: string; ip_address: string; port: number }>
+  }, compact: boolean = false) {
     if (compact) {
       // Compact format: concatenated 6-byte strings (4 bytes IP + 2 bytes port)
       const peersBinary = Buffer.concat(
-        data.peers.map((peer: any) => {
+        data.peers.map((peer) => {
           const ip = peer.ip_address.split('.').map((octet: string) => parseInt(octet))
           const port = peer.port
           return Buffer.from([...ip, port >> 8, port & 0xFF])
@@ -271,7 +277,7 @@ export class TorrentTracker {
       })
     } else {
       // Dictionary format
-      const peersDict = data.peers.map((peer: any) => ({
+      const peersDict = data.peers.map((peer) => ({
         'peer id': peer.peer_id,
         ip: peer.ip_address,
         port: peer.port
@@ -304,7 +310,7 @@ export class TorrentTracker {
     )
   }
 
-  private bencode(data: any): string {
+  private bencode(data: unknown): string {
     // Simple bencode implementation
     if (typeof data === 'string') {
       return `${data.length}:${data}`

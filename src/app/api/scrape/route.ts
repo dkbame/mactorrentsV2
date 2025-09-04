@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createServerSupabaseClient()
-    const results: any = {}
+    const results: Record<string, { complete: number; incomplete: number; downloaded: number }> = {}
     const oneHourAgo = new Date(Date.now() - 3600000).toISOString()
 
     for (const hashParam of infoHashParams) {
@@ -74,7 +74,7 @@ function decodeInfoHash(hash: string): string {
     .join('')
 }
 
-function bencode(data: any): string {
+function bencode(data: unknown): string {
   if (typeof data === 'string') {
     return `${data.length}:${data}`
   } else if (typeof data === 'number') {
