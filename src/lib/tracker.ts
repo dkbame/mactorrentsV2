@@ -1,7 +1,7 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http'
 import { parse } from 'url'
 // Crypto import removed - not used in this file
-import { createServerSupabaseClient } from './supabase'
+import { createServerSupabaseClient } from './supabase-server'
 
 interface Peer {
   peer_id: string

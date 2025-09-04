@@ -1,4 +1,4 @@
-import * as bencode from 'bencode'
+import bencode from 'bencode'
 import { createHash } from 'crypto'
 
 export interface TorrentFile {
@@ -107,7 +107,7 @@ export function parseTorrentFile(buffer: Buffer): TorrentMetadata {
 }
 
 export function generateMagnetLink(infoHash: string, name: string, trackers: string[] = []): string {
-  const defaultTracker = process.env.NEXT_PUBLIC_TRACKER_ANNOUNCE_URL || 'http://localhost:8080/announce'
+  const defaultTracker = process.env.NEXT_PUBLIC_TRACKER_ANNOUNCE_URL || 'https://cmacked.netlify.app/api/announce'
   const allTrackers = [defaultTracker, ...trackers]
   
   let magnetLink = `magnet:?xt=urn:btih:${infoHash}&dn=${encodeURIComponent(name)}`

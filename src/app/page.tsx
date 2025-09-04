@@ -3,7 +3,7 @@ import { ArrowRight, Download, Upload, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { LiveStats } from '@/components/tracker/live-stats'
 import { TorrentStatsInline } from '@/components/torrent/torrent-stats'
 
