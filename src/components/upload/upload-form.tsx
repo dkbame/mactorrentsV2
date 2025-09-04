@@ -60,18 +60,27 @@ export function UploadForm() {
       const buffer = await file.arrayBuffer()
       const parsedTorrent = parseTorrentFile(Buffer.from(buffer))
       
+      // Ensure we have a valid name
+      const torrentName = parsedTorrent.name || file.name.replace('.torrent', '')
+      
       setFormData(prev => ({
         ...prev,
         torrentFile: file,
         parsedTorrent,
-        title: prev.title || parsedTorrent.name
+        title: prev.title || torrentName
       }))
       
       setUploadStatus('idle')
       setStatusMessage('')
     } catch (error) {
+      console.error('Torrent parsing error:', error)
       setStatusMessage(error instanceof Error ? error.message : 'Invalid torrent file')
       setUploadStatus('error')
+      setFormData(prev => ({
+        ...prev,
+        torrentFile: null,
+        parsedTorrent: null
+      }))
     }
   }
 

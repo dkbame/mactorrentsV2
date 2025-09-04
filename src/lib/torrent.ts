@@ -70,7 +70,7 @@ export function parseTorrentFile(buffer: Buffer): TorrentMetadata {
     if (torrent.info.files) {
       // Multi-file torrent
       torrent.info.files.forEach(file => {
-        const filePath = file.path.join('/')
+        const filePath = Array.isArray(file.path) ? file.path.join('/') : String(file.path)
         files.push({
           path: filePath,
           size: file.length
@@ -79,18 +79,20 @@ export function parseTorrentFile(buffer: Buffer): TorrentMetadata {
       })
     } else if (torrent.info.length) {
       // Single-file torrent
+      const fileName = String(torrent.info.name || 'unknown')
       files.push({
-        path: torrent.info.name,
+        path: fileName,
         size: torrent.info.length
       })
       totalSize = torrent.info.length
     }
     
     // Generate magnet link
-    const magnetLink = generateMagnetLink(infoHash, torrent.info.name, announceUrls)
+    const torrentName = String(torrent.info.name || 'unknown')
+    const magnetLink = generateMagnetLink(infoHash, torrentName, announceUrls)
     
     return {
-      name: torrent.info.name,
+      name: torrentName,
       infoHash,
       magnetLink,
       files,

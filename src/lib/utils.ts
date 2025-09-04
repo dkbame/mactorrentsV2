@@ -39,6 +39,10 @@ export function generateMagnetLink(infoHash: string, name: string, trackers: str
 }
 
 export function createSlug(title: string): string {
+  if (!title || typeof title !== 'string') {
+    return 'untitled'
+  }
+  
   return title
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
