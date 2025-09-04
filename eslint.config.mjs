@@ -17,7 +17,12 @@ const eslintConfig = [
       ".next/**",
       "out/**",
       "build/**",
+      "dist/**",
       "next-env.d.ts",
+      "scripts/**",
+      "tracker-server.js",
+      "*.config.js",
+      "*.config.mjs",
     ],
   },
 ];

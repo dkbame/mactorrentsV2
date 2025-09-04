@@ -83,9 +83,9 @@ function bencode(data: unknown): string {
     return `${data.length}:${data.toString('binary')}`
   } else if (Array.isArray(data)) {
     return `l${data.map(item => bencode(item)).join('')}e`
-  } else if (typeof data === 'object') {
+  } else if (typeof data === 'object' && data !== null) {
     const keys = Object.keys(data).sort()
-    const pairs = keys.map(key => bencode(key) + bencode(data[key]))
+    const pairs = keys.map(key => bencode(key) + bencode((data as Record<string, unknown>)[key]))
     return `d${pairs.join('')}e`
   }
   return ''

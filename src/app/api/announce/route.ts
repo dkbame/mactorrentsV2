@@ -10,7 +10,7 @@ interface AnnounceParams {
   left: number
   event?: string
   compact?: boolean
-  numwant?: number
+  numwant: number
 }
 
 export async function GET(request: NextRequest) {
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       left: parseInt(searchParams.get('left')!) || 0,
       event: searchParams.get('event') || undefined,
       compact: searchParams.get('compact') === '1',
-      numwant: parseInt(searchParams.get('numwant')!) || 50
+      numwant: parseInt(searchParams.get('numwant') || '50') || 50
     }
 
     const supabase = await createServerSupabaseClient()
@@ -205,9 +205,9 @@ function bencode(data: unknown): string {
     return `${data.length}:${data.toString('binary')}`
   } else if (Array.isArray(data)) {
     return `l${data.map(item => bencode(item)).join('')}e`
-  } else if (typeof data === 'object') {
+  } else if (typeof data === 'object' && data !== null) {
     const keys = Object.keys(data).sort()
-    const pairs = keys.map(key => bencode(key) + bencode(data[key]))
+    const pairs = keys.map(key => bencode(key) + bencode((data as Record<string, unknown>)[key]))
     return `d${pairs.join('')}e`
   }
   return ''

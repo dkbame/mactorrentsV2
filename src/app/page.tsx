@@ -35,18 +35,18 @@ export default async function Home() {
               A curated platform for open-source and freeware macOS software.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
-              <Button size="lg" className="bg-apple-blue text-white hover:bg-apple-blue/90" asChild>
-                <Link href="/browse">
+              <Link href="/browse">
+                <Button size="lg" className="bg-apple-blue text-white hover:bg-apple-blue/90">
                   <Download className="mr-2 h-4 w-4" />
                   Browse Apps
-                </Link>
-              </Button>
-              <Button variant="outline" size="lg" asChild>
-                <Link href="/upload">
+                </Button>
+              </Link>
+              <Link href="/upload">
+                <Button variant="outline" size="lg">
                   <Upload className="mr-2 h-4 w-4" />
                   Upload Torrent
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -88,24 +88,24 @@ export default async function Home() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <Button variant="ghost" className="w-full justify-between group-hover:bg-accent/50 backdrop-blur-sm" asChild>
-                        <Link href={`/category/${category.slug}`}>
-                          Browse {category.name}
-                          <ArrowRight className="h-4 w-4" />
-                        </Link>
-                      </Button>
+                                        <Link href={`/category/${category.slug}`}>
+                    <Button variant="ghost" className="w-full justify-between group-hover:bg-accent/50 backdrop-blur-sm">
+                      Browse {category.name}
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
                     </CardContent>
                   </Card>
                 ))}
               </div>
 
               <div className="text-center">
-                <Button variant="outline" size="lg" asChild>
-                  <Link href="/categories">
-                    View All Categories
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
+                            <Link href="/categories">
+              <Button variant="outline" size="lg">
+                View All Categories
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
               </div>
             </>
           ) : (
@@ -130,12 +130,12 @@ export default async function Home() {
                 Latest apps and games added to the platform
               </p>
             </div>
-            <Button variant="outline" asChild>
-              <Link href="/recent">
+            <Link href="/recent">
+              <Button variant="outline">
                 View All
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           </div>
 
           {/* Placeholder for recent torrents - will be populated with real data later */}

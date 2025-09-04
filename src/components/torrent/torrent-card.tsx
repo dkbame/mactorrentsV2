@@ -91,15 +91,14 @@ export function TorrentCard({ torrent }: TorrentCardProps) {
 
       <CardFooter className="pt-3">
         <div className="flex w-full space-x-2">
-          <Button 
-            size="sm" 
-            className="flex-1"
-            asChild
-          >
-            <Link href={`/torrent/${torrent.slug}`}>
+          <Link href={`/torrent/${torrent.slug}`}>
+            <Button 
+              size="sm" 
+              className="flex-1"
+            >
               View Details
-            </Link>
-          </Button>
+            </Button>
+          </Link>
           <Button 
             size="sm" 
             variant="outline"

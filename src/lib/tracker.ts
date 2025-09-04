@@ -1,6 +1,6 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http'
 import { parse } from 'url'
-import { createHash } from 'crypto'
+// Crypto import removed - not used in this file
 import { createServerSupabaseClient } from './supabase'
 
 interface Peer {
@@ -16,7 +16,7 @@ interface Peer {
 
 interface AnnounceParams extends Peer {
   info_hash: string
-  numwant?: number
+  numwant: number
 }
 
 export class TorrentTracker {
@@ -64,7 +64,7 @@ export class TorrentTracker {
     }
   }
 
-  private async handleAnnounce(req: IncomingMessage, res: ServerResponse, query: Record<string, string | string[]>) {
+  private async handleAnnounce(req: IncomingMessage, res: ServerResponse, query: Record<string, string | string[] | undefined>) {
     // Validate required parameters
     const requiredParams = ['info_hash', 'peer_id', 'port', 'uploaded', 'downloaded', 'left']
     for (const param of requiredParams) {
@@ -74,20 +74,20 @@ export class TorrentTracker {
     }
 
     const params: AnnounceParams = {
-      info_hash: this.decodeInfoHash(query.info_hash),
-      peer_id: query.peer_id,
+      info_hash: this.decodeInfoHash(query.info_hash as string),
+      peer_id: query.peer_id as string,
       ip: this.getClientIP(req),
-      port: parseInt(query.port),
-      uploaded: parseInt(query.uploaded) || 0,
-      downloaded: parseInt(query.downloaded) || 0,
-      left: parseInt(query.left) || 0,
-      event: query.event,
-      compact: query.compact === '1',
-      numwant: parseInt(query.numwant) || 50
+      port: parseInt(query.port as string) || 0,
+      uploaded: parseInt(query.uploaded as string) || 0,
+      downloaded: parseInt(query.downloaded as string) || 0,
+      left: parseInt(query.left as string) || 0,
+      event: query.event as string,
+      compact: (query.compact as string) === '1',
+      numwant: parseInt(query.numwant as string) || 50
     }
 
     try {
-      const supabase = createServerSupabaseClient()
+      const supabase = await createServerSupabaseClient()
       
       // Check if torrent exists
       const { data: torrent, error: torrentError } = await supabase
@@ -163,7 +163,7 @@ export class TorrentTracker {
     }
   }
 
-  private async handleScrape(req: IncomingMessage, res: ServerResponse, query: Record<string, string | string[]>) {
+  private async handleScrape(req: IncomingMessage, res: ServerResponse, query: Record<string, string | string[] | undefined>) {
     const infoHashes = Array.isArray(query.info_hash) ? query.info_hash : [query.info_hash]
     
     if (!infoHashes[0]) {
@@ -171,8 +171,8 @@ export class TorrentTracker {
     }
 
     try {
-      const supabase = createServerSupabaseClient()
-      const results: any = {}
+      const supabase = await createServerSupabaseClient()
+      const results: Record<string, { complete: number; incomplete: number; downloaded: number }> = {}
 
       for (const hashParam of infoHashes) {
         if (!hashParam) continue
@@ -213,7 +213,7 @@ export class TorrentTracker {
 
   private async handleStats(req: IncomingMessage, res: ServerResponse) {
     try {
-      const supabase = createServerSupabaseClient()
+      const supabase = await createServerSupabaseClient()
       
       const { data: torrents, error: torrentsError } = await supabase
         .from('torrents')
@@ -320,9 +320,9 @@ export class TorrentTracker {
       return `${data.length}:${data.toString('binary')}`
     } else if (Array.isArray(data)) {
       return `l${data.map(item => this.bencode(item)).join('')}e`
-    } else if (typeof data === 'object') {
+    } else if (typeof data === 'object' && data !== null) {
       const keys = Object.keys(data).sort()
-      const pairs = keys.map(key => this.bencode(key) + this.bencode(data[key]))
+      const pairs = keys.map(key => this.bencode(key) + this.bencode((data as Record<string, unknown>)[key]))
       return `d${pairs.join('')}e`
     }
     return ''

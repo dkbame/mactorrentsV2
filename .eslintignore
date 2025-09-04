@@ -1,0 +1,21 @@
+# Build outputs
+.next/
+out/
+dist/
+
+# Dependencies
+node_modules/
+
+# Environment files
+.env*
+
+# Utility scripts (CommonJS)
+scripts/
+tracker-server.js
+
+# Config files
+*.config.js
+*.config.mjs
+
+# Generated files
+next-env.d.ts

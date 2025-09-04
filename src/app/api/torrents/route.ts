@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort') || 'created_at'
     const order = searchParams.get('order') || 'desc'
 
-    const supabase = createServerSupabaseClient()
+    const supabase = await createServerSupabaseClient()
     
     let query = supabase
       .from('torrents')
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient()
+    const supabase = await createServerSupabaseClient()
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()

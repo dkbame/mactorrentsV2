@@ -20,7 +20,7 @@ export interface Database {
           created_at?: string
           last_login?: string | null
           is_active?: boolean
-          profile_data?: Record<string, any> | null
+          profile_data?: Record<string, unknown> | null
         }
         Update: {
           id?: string
@@ -30,7 +30,7 @@ export interface Database {
           created_at?: string
           last_login?: string | null
           is_active?: boolean
-          profile_data?: Record<string, any> | null
+          profile_data?: Record<string, unknown> | null
         }
       }
       categories: {
@@ -104,7 +104,7 @@ export interface Database {
           seed_count?: number
           leech_count?: number
           rating?: number
-          metadata?: Record<string, any> | null
+          metadata?: Record<string, unknown> | null
           created_at?: string
           updated_at?: string
           is_active?: boolean
@@ -126,7 +126,7 @@ export interface Database {
           seed_count?: number
           leech_count?: number
           rating?: number
-          metadata?: Record<string, any> | null
+          metadata?: Record<string, unknown> | null
           created_at?: string
           updated_at?: string
           is_active?: boolean
