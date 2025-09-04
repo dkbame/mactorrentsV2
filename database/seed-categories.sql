@@ -1,0 +1,23 @@
+-- Insert macOS App Store categories
+INSERT INTO public.categories (name, slug, description, icon, sort_order, is_active) VALUES
+('Business', 'business', 'Productivity, finance, and project management apps', '💼', 1, true),
+('Developer Tools', 'developer-tools', 'IDEs, debugging, version control, and development utilities', '⚒️', 2, true),
+('Education', 'education', 'Learning apps, reference materials, and educational tools', '🎓', 3, true),
+('Entertainment', 'entertainment', 'Media players, streaming apps, and entertainment software', '🎬', 4, true),
+('Finance', 'finance', 'Banking, budgeting, investment, and financial management tools', '💰', 5, true),
+('Games', 'games', 'All game genres and gaming utilities', '🎮', 6, true),
+('Graphics & Design', 'graphics-design', 'Image editing, design tools, CAD, and creative software', '🎨', 7, true),
+('Health & Fitness', 'health-fitness', 'Workout apps, health tracking, and wellness tools', '💪', 8, true),
+('Lifestyle', 'lifestyle', 'Home, food, travel, and lifestyle applications', '🏠', 9, true),
+('Medical', 'medical', 'Healthcare professional tools and medical software', '⚕️', 10, true),
+('Music', 'music', 'Audio production, music players, and sound editing tools', '🎵', 11, true),
+('News', 'news', 'News readers, journalism tools, and information apps', '📰', 12, true),
+('Photography', 'photography', 'Photo editing, camera apps, and photography tools', '📸', 13, true),
+('Productivity', 'productivity', 'Task management, note-taking, and productivity utilities', '📝', 14, true),
+('Reference', 'reference', 'Dictionaries, encyclopedias, guides, and reference materials', '📚', 15, true),
+('Social Networking', 'social-networking', 'Social media, communication, and networking apps', '👥', 16, true),
+('Sports', 'sports', 'Sports tracking, team management, and athletic apps', '⚽', 17, true),
+('Travel', 'travel', 'Maps, booking, travel planning, and navigation apps', '✈️', 18, true),
+('Utilities', 'utilities', 'System tools, file management, and utility applications', '🔧', 19, true),
+('Video', 'video', 'Video editing, streaming, and production software', '🎥', 20, true),
+('Weather', 'weather', 'Weather apps, forecasting, and meteorological tools', '🌤️', 21, true);

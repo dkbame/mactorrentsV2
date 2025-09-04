@@ -1,26 +1,191 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Light theme colors inspired by macOS */
+  --background: 0 0% 100%; /* #FFFFFF */
+  --foreground: 220 9% 12%; /* #1C1C1E */
+  --card: 0 0% 100%; /* #FFFFFF */
+  --card-foreground: 220 9% 12%; /* #1C1C1E */
+  --popover: 0 0% 100%; /* #FFFFFF */
+  --popover-foreground: 220 9% 12%; /* #1C1C1E */
+  --primary: 213 100% 50%; /* #007AFF - Apple Blue */
+  --primary-foreground: 0 0% 100%; /* #FFFFFF */
+  --secondary: 240 5% 95%; /* #F2F2F7 */
+  --secondary-foreground: 220 9% 12%; /* #1C1C1E */
+  --muted: 240 5% 95%; /* #F2F2F7 */
+  --muted-foreground: 220 4% 58%; /* #8E8E93 */
+  --accent: 240 5% 95%; /* #F2F2F7 */
+  --accent-foreground: 220 9% 12%; /* #1C1C1E */
+  --destructive: 0 84% 60%; /* #FF3B30 - Apple Red */
+  --destructive-foreground: 0 0% 100%; /* #FFFFFF */
+  --border: 240 6% 90%; /* #E5E5EA */
+  --input: 240 6% 90%; /* #E5E5EA */
+  --ring: 213 100% 50%; /* #007AFF */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Dark theme colors inspired by macOS */
+    --background: 0 0% 0%; /* #000000 */
+    --foreground: 0 0% 100%; /* #FFFFFF */
+    --card: 220 9% 12%; /* #1C1C1E */
+    --card-foreground: 0 0% 100%; /* #FFFFFF */
+    --popover: 220 9% 12%; /* #1C1C1E */
+    --popover-foreground: 0 0% 100%; /* #FFFFFF */
+    --primary: 213 100% 52%; /* #0A84FF - Apple Blue Dark */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF */
+    --secondary: 220 7% 18%; /* #2C2C2E */
+    --secondary-foreground: 0 0% 100%; /* #FFFFFF */
+    --muted: 220 7% 18%; /* #2C2C2E */
+    --muted-foreground: 220 4% 68%; /* #AEAEB2 */
+    --accent: 220 7% 18%; /* #2C2C2E */
+    --accent-foreground: 0 0% 100%; /* #FFFFFF */
+    --destructive: 0 72% 61%; /* #FF453A - Apple Red Dark */
+    --destructive-foreground: 0 0% 100%; /* #FFFFFF */
+    --border: 220 6% 23%; /* #3A3A3C */
+    --input: 220 6% 23%; /* #3A3A3C */
+    --ring: 213 100% 52%; /* #0A84FF */
   }
 }
 
+* {
+  border-color: hsl(var(--border));
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glass morphism utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+@media (prefers-color-scheme: dark) {
+  .glass {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+}
+
+.glass-dark {
+  background: rgba(28, 28, 30, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced button styling */
+button[class*="bg-primary"] {
+  color: white !important;
+  font-weight: 500;
+  background: linear-gradient(135deg, #007AFF 0%, #005FCC 100%);
+  box-shadow: 0 4px 14px 0 rgba(0, 122, 255, 0.39);
+  transition: all 0.2s ease;
+}
+
+button[class*="bg-primary"]:hover {
+  background: linear-gradient(135deg, #0056CC 0%, #004499 100%);
+  box-shadow: 0 6px 20px 0 rgba(0, 122, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+button[class*="bg-apple-blue"] {
+  background: linear-gradient(135deg, #007AFF 0%, #005FCC 100%);
+  box-shadow: 0 4px 14px 0 rgba(0, 122, 255, 0.39);
+  transition: all 0.2s ease;
+}
+
+button[class*="bg-apple-blue"]:hover {
+  background: linear-gradient(135deg, #0056CC 0%, #004499 100%);
+  box-shadow: 0 6px 20px 0 rgba(0, 122, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+/* Outline button improvements */
+button[class*="variant-outline"] {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+button[class*="variant-outline"]:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Header glass effect */
+header {
+  background: rgba(28, 28, 30, 0.85) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Enhanced card styling */
+.glass.border-border\/50 {
+  border: 1px solid rgba(229, 229, 234, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .glass.border-border\/50 {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+  }
+}
+
+/* Card hover effects */
+.group:hover .glass {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(229, 229, 234, 0.4);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+  .group:hover .glass {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--foreground) / 0.6);
+}
+
+/* Focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background;
 }
