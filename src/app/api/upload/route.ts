@@ -57,33 +57,18 @@ export async function POST(request: NextRequest) {
     // Create slug from title
     const slug = createSlug(title)
 
-    // For now, we'll create a temporary user or skip user requirement
-    // In production, you'd check authentication here
-    
-    // First, let's create a default "system" user if it doesn't exist
-    let uploaderId = 'system-uploader'
-    
-    const { data: systemUser } = await supabase
+    // Use anonymous user for uploads until authentication is implemented
+    const { data: anonymousUser } = await supabase
       .from('users')
       .select('id')
-      .eq('username', 'system')
+      .eq('username', 'anonymous')
       .single()
     
-    if (!systemUser) {
-      // Create system user for uploads when no auth is available
-      const { data: newUser } = await supabase
-        .from('users')
-        .insert({
-          email: 'system@mactorrents.com',
-          username: 'system',
-          role: 'admin'
-        })
-        .select('id')
-        .single()
-      
-      uploaderId = newUser?.id || uploaderId
-    } else {
-      uploaderId = systemUser.id
+    if (!anonymousUser) {
+      return NextResponse.json(
+        { error: 'System user not found. Please contact administrator.' },
+        { status: 500 }
+      )
     }
 
     // Insert torrent into database
@@ -94,7 +79,7 @@ export async function POST(request: NextRequest) {
         slug,
         description: description || null,
         category_id: categoryId,
-        uploader_id: uploaderId,
+        uploader_id: anonymousUser.id,
         info_hash: parsedTorrent.infoHash,
         file_size: parsedTorrent.totalSize,
         piece_length: parsedTorrent.pieceLength,
