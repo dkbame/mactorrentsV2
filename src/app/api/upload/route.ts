@@ -57,6 +57,35 @@ export async function POST(request: NextRequest) {
     // Create slug from title
     const slug = createSlug(title)
 
+    // For now, we'll create a temporary user or skip user requirement
+    // In production, you'd check authentication here
+    
+    // First, let's create a default "system" user if it doesn't exist
+    let uploaderId = 'system-uploader'
+    
+    const { data: systemUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', 'system')
+      .single()
+    
+    if (!systemUser) {
+      // Create system user for uploads when no auth is available
+      const { data: newUser } = await supabase
+        .from('users')
+        .insert({
+          email: 'system@mactorrents.com',
+          username: 'system',
+          role: 'admin'
+        })
+        .select('id')
+        .single()
+      
+      uploaderId = newUser?.id || uploaderId
+    } else {
+      uploaderId = systemUser.id
+    }
+
     // Insert torrent into database
     const { data: torrent, error } = await supabase
       .from('torrents')
@@ -65,7 +94,7 @@ export async function POST(request: NextRequest) {
         slug,
         description: description || null,
         category_id: categoryId,
-        uploader_id: 'placeholder-user-id', // TODO: Replace with real user ID
+        uploader_id: uploaderId,
         info_hash: parsedTorrent.infoHash,
         file_size: parsedTorrent.totalSize,
         piece_length: parsedTorrent.pieceLength,
@@ -84,7 +113,10 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Database error:', error)
       return NextResponse.json(
-        { error: 'Failed to save torrent to database' },
+        { 
+          error: 'Failed to save torrent to database',
+          details: error.message 
+        },
         { status: 500 }
       )
     }

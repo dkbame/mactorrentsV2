@@ -79,7 +79,24 @@ export function parseTorrentFile(buffer: Buffer): TorrentMetadata {
       })
     } else if (torrent.info.length) {
       // Single-file torrent
-      const fileName = String(torrent.info.name || 'unknown')
+      let fileName = 'unknown'
+      const rawFileName = torrent.info.name
+      
+      try {
+        if (Buffer.isBuffer(rawFileName)) {
+          fileName = rawFileName.toString('utf8')
+        } else if (Array.isArray(rawFileName)) {
+          fileName = String.fromCharCode(...rawFileName)
+        } else if (typeof rawFileName === 'string') {
+          fileName = rawFileName
+        } else {
+          // Try to convert to Buffer and then to string
+          fileName = Buffer.from(rawFileName as unknown as ArrayLike<number>).toString('utf8')
+        }
+      } catch {
+        fileName = String(rawFileName || 'unknown')
+      }
+      
       files.push({
         path: fileName,
         size: torrent.info.length
@@ -87,8 +104,26 @@ export function parseTorrentFile(buffer: Buffer): TorrentMetadata {
       totalSize = torrent.info.length
     }
     
-    // Generate magnet link
-    const torrentName = String(torrent.info.name || 'unknown')
+    // Generate magnet link - handle Buffer/Uint8Array names
+    let torrentName: string = 'unknown'
+    const rawName = torrent.info.name
+    
+    // Convert Buffer/Uint8Array to string if needed
+    try {
+      if (Buffer.isBuffer(rawName)) {
+        torrentName = rawName.toString('utf8')
+      } else if (Array.isArray(rawName)) {
+        torrentName = String.fromCharCode(...rawName)
+      } else if (typeof rawName === 'string') {
+        torrentName = rawName
+      } else {
+        // Try to convert to Buffer and then to string
+        torrentName = Buffer.from(rawName as unknown as ArrayLike<number>).toString('utf8')
+      }
+    } catch {
+      torrentName = String(rawName || 'unknown')
+    }
+    
     const magnetLink = generateMagnetLink(infoHash, torrentName, announceUrls)
     
     return {
