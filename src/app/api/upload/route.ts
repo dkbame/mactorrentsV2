@@ -5,13 +5,24 @@ import { createSlug } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('Upload API called')
+    
     const formData = await request.formData()
     const file = formData.get('torrent') as File
     const title = formData.get('title') as string
     const description = formData.get('description') as string
     const categoryId = formData.get('category_id') as string
 
+    console.log('Form data:', { 
+      hasFile: !!file, 
+      title: title?.substring(0, 50), 
+      categoryId,
+      fileType: file?.type,
+      fileName: file?.name 
+    })
+
     if (!file || !title || !categoryId) {
+      console.log('Missing required fields:', { file: !!file, title: !!title, categoryId: !!categoryId })
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -29,11 +40,18 @@ export async function POST(request: NextRequest) {
     // Parse torrent file
     let parsedTorrent
     try {
+      console.log('Parsing torrent file...')
       const buffer = await file.arrayBuffer()
       parsedTorrent = parseTorrentFile(Buffer.from(buffer))
+      console.log('Torrent parsed successfully:', { 
+        name: parsedTorrent.name?.substring(0, 50),
+        infoHash: parsedTorrent.infoHash?.substring(0, 16),
+        fileCount: parsedTorrent.files?.length 
+      })
     } catch (error) {
+      console.error('Torrent parsing error:', error)
       return NextResponse.json(
-        { error: 'Invalid torrent file format' },
+        { error: 'Invalid torrent file format', details: error instanceof Error ? error.message : 'Unknown error' },
         { status: 400 }
       )
     }
@@ -71,10 +89,15 @@ export async function POST(request: NextRequest) {
     if (uploadError) {
       console.error('File upload error:', uploadError)
       return NextResponse.json(
-        { error: 'Failed to upload torrent file to storage' },
+        { 
+          error: 'Failed to upload torrent file to storage',
+          details: uploadError.message
+        },
         { status: 500 }
       )
     }
+    
+    console.log('File uploaded successfully:', uploadData.path)
 
     // Get the public URL for the uploaded file
     const { data: publicUrlData } = supabase.storage
@@ -82,15 +105,21 @@ export async function POST(request: NextRequest) {
       .getPublicUrl(fileName)
 
     // Use anonymous user for uploads until authentication is implemented
-    const { data: anonymousUser } = await supabase
+    console.log('Looking for anonymous user...')
+    const { data: anonymousUser, error: userError } = await supabase
       .from('users')
       .select('id')
       .eq('username', 'anonymous')
       .single()
     
+    console.log('Anonymous user result:', { user: !!anonymousUser, error: userError?.message })
+    
     if (!anonymousUser) {
       return NextResponse.json(
-        { error: 'System user not found. Please contact administrator.' },
+        { 
+          error: 'System user not found. Please run the create-system-user.sql script in your Supabase dashboard.',
+          details: userError?.message 
+        },
         { status: 500 }
       )
     }
