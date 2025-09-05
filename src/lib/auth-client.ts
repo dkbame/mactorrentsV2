@@ -1,4 +1,4 @@
-import { createClientSupabaseClient } from './supabase-client'
+import { createClient } from './supabase-client'
 
 export interface User {
   id: string
@@ -20,5 +20,5 @@ export async function generatePasskey(): Promise<string> {
 }
 
 export function getClientSupabase() {
-  return createClientSupabaseClient()
+  return createClient()
 }

@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from './supabase-server'
-import { createClientSupabaseClient } from './supabase-client'
+import { createClient } from './supabase-client'
 import { redirect } from 'next/navigation'
 
 export interface User {
@@ -62,5 +62,5 @@ export async function generatePasskey(): Promise<string> {
 }
 
 export function getClientSupabase() {
-  return createClientSupabaseClient()
+  return createClient()
 }
