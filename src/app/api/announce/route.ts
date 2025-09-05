@@ -11,6 +11,7 @@ interface AnnounceParams {
   event?: string
   compact?: boolean
   numwant: number
+  passkey?: string
 }
 
 export async function GET(request: NextRequest) {
@@ -34,13 +35,27 @@ export async function GET(request: NextRequest) {
       left: parseInt(searchParams.get('left')!) || 0,
       event: searchParams.get('event') || undefined,
       compact: searchParams.get('compact') === '1',
-      numwant: parseInt(searchParams.get('numwant') || '50') || 50
+      numwant: parseInt(searchParams.get('numwant') || '50') || 50,
+      passkey: searchParams.get('passkey') || undefined
     }
 
     const supabase = await createServerSupabaseClient()
     
     // Get client IP
     const clientIP = getClientIP(request)
+
+    // Validate passkey if provided
+    if (params.passkey) {
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('passkey', params.passkey)
+        .single()
+
+      if (userError || !user) {
+        return sendError('Invalid passkey')
+      }
+    }
 
     // Check if torrent exists
     const { data: torrent, error: torrentError } = await supabase

@@ -1,13 +1,42 @@
 'use client'
 
 import Link from 'next/link'
-import { Search, User, Download, Upload } from 'lucide-react'
+import { Search, User, Download, Upload, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { getClientSupabase } from '@/lib/auth'
+import { useRouter } from 'next/navigation'
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+  const supabase = getClientSupabase()
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null)
+        setLoading(false)
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [supabase.auth])
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.push('/')
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 glass backdrop-blur-xl">
@@ -66,15 +95,44 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" className="hidden sm:flex">
-            <Upload className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="hidden sm:flex">
-            <Download className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <User className="h-4 w-4" />
-          </Button>
+          <Link href="/upload">
+            <Button variant="ghost" size="icon" className="hidden sm:flex">
+              <Upload className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Link href="/browse">
+            <Button variant="ghost" size="icon" className="hidden sm:flex">
+              <Download className="h-4 w-4" />
+            </Button>
+          </Link>
+          
+          {loading ? (
+            <div className="h-8 w-8 animate-pulse bg-muted rounded" />
+          ) : user ? (
+            <div className="flex items-center space-x-2">
+              <Link href="/dashboard">
+                <Button variant="ghost" size="sm">
+                  Dashboard
+                </Button>
+              </Link>
+              <Button variant="ghost" size="icon" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <Link href="/login">
+                <Button variant="ghost" size="sm">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button size="sm" className="bg-apple-blue text-white hover:bg-apple-blue/90">
+                  Sign Up
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </header>
