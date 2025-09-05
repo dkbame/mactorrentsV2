@@ -35,25 +35,8 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        // Check if user has a passkey, if not create one
-        const { data: profile } = await supabase
-          .from('users')
-          .select('passkey')
-          .eq('id', data.user.id)
-          .single()
-
-        if (!profile?.passkey) {
-          // Generate passkey for existing user
-          const passkey = Array.from({ length: 32 }, () => 
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 62)]
-          ).join('')
-
-          await supabase
-            .from('users')
-            .update({ passkey })
-            .eq('id', data.user.id)
-        }
-
+        // User profile should exist (created by trigger)
+        // If not, it will be created automatically
         router.push('/dashboard')
       }
     } catch (err) {

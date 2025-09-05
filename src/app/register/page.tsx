@@ -37,27 +37,7 @@ export default function RegisterPage() {
       }
 
       if (data.user) {
-        // Generate unique passkey
-        const passkey = Array.from({ length: 32 }, () => 
-          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 62)]
-        ).join('')
-
-        // Create user profile with passkey
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert({
-            id: data.user.id,
-            email: data.user.email,
-            username: username || data.user.email?.split('@')[0] || 'user',
-            passkey,
-            role: 'user'
-          })
-
-        if (profileError) {
-          setError('Failed to create user profile')
-          return
-        }
-
+        // User profile will be created automatically by database trigger
         // Check if email confirmation is required
         if (data.user.email_confirmed_at) {
           router.push('/dashboard')
