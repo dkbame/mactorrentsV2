@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { LiveStats } from '@/components/tracker/live-stats'
 import { TorrentStatsInline } from '@/components/torrent/torrent-stats'
+import { RecentTorrents } from '@/components/torrent/recent-torrents'
 
 export default async function Home() {
   // Fetch real categories from Supabase
@@ -138,35 +139,7 @@ export default async function Home() {
             </Link>
           </div>
 
-          {/* Placeholder for recent torrents - will be populated with real data later */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="glass">
-                <CardHeader>
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="secondary">Games</Badge>
-                    <Badge variant="success">
-                      <Star className="h-3 w-3 mr-1" />
-                      Featured
-                    </Badge>
-                  </div>
-                  <CardTitle>Sample macOS Game {i}</CardTitle>
-                  <CardDescription>
-                    A fantastic free game for macOS users to enjoy.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>250 MB</span>
-                    <TorrentStatsInline seeders={45} leechers={12} />
-                  </div>
-                  <Button className="w-full mt-4" variant="outline">
-                    View Details
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <RecentTorrents />
         </div>
       </section>
     </div>
