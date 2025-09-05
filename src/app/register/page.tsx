@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { getClientSupabase } from '@/lib/auth'
+import { getClientSupabase } from '@/lib/auth-client'
 import { Apple } from 'lucide-react'
 
 export default function RegisterPage() {

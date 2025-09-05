@@ -1,6 +1,5 @@
 import { createServerSupabaseClient } from './supabase-server'
 import { createClientSupabaseClient } from './supabase-client'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 export interface User {

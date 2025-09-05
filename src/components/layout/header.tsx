@@ -5,7 +5,7 @@ import { Search, User, Download, Upload, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useState, useEffect } from 'react'
-import { getClientSupabase } from '@/lib/auth'
+import { getClientSupabase } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
 
 export function Header() {
@@ -17,21 +17,42 @@ export function Header() {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
+    const getInitialSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        console.log('Initial session:', session?.user?.email)
+        setUser(session?.user ?? null)
+        setLoading(false)
+      } catch (error) {
+        console.error('Error getting session:', error)
+        setLoading(false)
+      }
+    }
+
+    getInitialSession()
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email)
         setUser(session?.user ?? null)
         setLoading(false)
       }
     )
 
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
+    // Fallback timeout in case auth never loads
+    const timeout = setTimeout(() => {
+      if (loading) {
+        console.log('Auth loading timeout - showing login buttons')
+        setLoading(false)
+      }
+    }, 3000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeout)
+    }
+  }, [loading])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -107,7 +128,10 @@ export function Header() {
           </Link>
           
           {loading ? (
-            <div className="h-8 w-8 animate-pulse bg-muted rounded" />
+            <div className="flex items-center space-x-2">
+              <div className="h-8 w-8 animate-pulse bg-muted rounded" />
+              <span className="text-sm text-muted-foreground">Loading...</span>
+            </div>
           ) : user ? (
             <div className="flex items-center space-x-2">
               <Link href="/dashboard">
