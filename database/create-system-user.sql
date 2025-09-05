@@ -1,19 +1,10 @@
 -- Create a system user for uploads when no authentication is available
 -- This is a temporary solution until proper user authentication is implemented
 
--- Insert system user (this will be used for uploads when no user is authenticated)
+-- Insert anonymous user with explicit UUID generation
 INSERT INTO public.users (id, email, username, role, is_active) 
 VALUES (
-  '00000000-0000-0000-0000-000000000000',
-  'system@mactorrents.com',
-  'system',
-  'admin',
-  true
-) ON CONFLICT (id) DO NOTHING;
-
--- Also insert by email in case the UUID conflicts
-INSERT INTO public.users (email, username, role, is_active) 
-VALUES (
+  uuid_generate_v4(),
   'anonymous@mactorrents.com',
   'anonymous',
   'user',

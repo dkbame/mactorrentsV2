@@ -104,27 +104,10 @@ export async function POST(request: NextRequest) {
       .from('torrent-files')
       .getPublicUrl(fileName)
 
-    // Use anonymous user for uploads until authentication is implemented
-    console.log('Looking for anonymous user...')
-    const { data: anonymousUser, error: userError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('username', 'anonymous')
-      .single()
-    
-    console.log('Anonymous user result:', { user: !!anonymousUser, error: userError?.message })
-    
-    if (!anonymousUser) {
-      return NextResponse.json(
-        { 
-          error: 'System user not found. Please run the create-system-user.sql script in your Supabase dashboard.',
-          details: userError?.message 
-        },
-        { status: 500 }
-      )
-    }
+    // For now, skip user requirement until authentication is implemented
+    console.log('Skipping user authentication for upload...')
 
-    // Insert torrent into database
+    // Insert torrent into database without uploader_id
     const { data: torrent, error } = await supabase
       .from('torrents')
       .insert({
@@ -132,7 +115,7 @@ export async function POST(request: NextRequest) {
         slug,
         description: description || null,
         category_id: categoryId,
-        uploader_id: anonymousUser.id,
+        // uploader_id: null, // Will be set when we implement authentication
         info_hash: parsedTorrent.infoHash,
         file_size: parsedTorrent.totalSize,
         piece_length: parsedTorrent.pieceLength,
