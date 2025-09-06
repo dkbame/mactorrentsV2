@@ -1,0 +1,60 @@
+-- Minimal database cleanup and admin setup
+-- This works with the existing schema
+
+-- Clean up all existing data
+DELETE FROM public.torrents;
+DELETE FROM public.peers;
+DELETE FROM public.users;
+DELETE FROM auth.users;
+
+-- Create a simple admin user in auth.users
+INSERT INTO auth.users (
+    id,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    created_at,
+    raw_app_meta_data,
+    raw_user_meta_data
+) VALUES (
+    '00000000-0000-0000-0000-000000000001',
+    'admin@mactorrents.com',
+    '$2a$10$dummy.hash.for.testing.purposes.only',
+    NOW(),
+    NOW(),
+    '{"provider": "email", "providers": ["email"]}',
+    '{"username": "admin"}'
+);
+
+-- Create the public user profile for admin (using existing schema)
+INSERT INTO public.users (
+    id,
+    email,
+    username,
+    role,
+    created_at,
+    is_active,
+    profile_data
+) VALUES (
+    '00000000-0000-0000-0000-000000000001',
+    'admin@mactorrents.com',
+    'admin',
+    'admin',
+    NOW(),
+    true,
+    '{"passkey": "ADMIN_PASSKEY_1234567890123456789012"}'
+);
+
+-- Show the created admin user
+SELECT 
+    u.id,
+    u.email,
+    u.username,
+    u.role,
+    u.created_at,
+    u.profile_data
+FROM public.users u
+WHERE u.email = 'admin@mactorrents.com';
+
+-- Show total user count
+SELECT COUNT(*) as total_users FROM public.users;

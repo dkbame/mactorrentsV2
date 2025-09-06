@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { getClientSupabase } from '@/lib/auth-client'
 import { Apple } from 'lucide-react'
 
 export default function RegisterPage() {
@@ -16,62 +15,43 @@ export default function RegisterPage() {
   const [username, setUsername] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
   const router = useRouter()
-  const supabase = getClientSupabase()
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setSuccess(false)
 
     try {
-      // Register user with Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          username
+        })
       })
 
-      if (error) {
-        setError(error.message)
+      const result = await response.json()
+
+      if (!response.ok) {
+        setError(result.error || 'Registration failed')
         return
       }
 
-      if (data.user) {
-        // Create user profile using API endpoint
-        try {
-          const response = await fetch('/api/create-profile', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              user_id: data.user.id,
-              email: data.user.email,
-              username: username || data.user.email?.split('@')[0] || 'user'
-            })
-          })
+      setSuccess(true)
+      setError('')
+      
+      // Redirect to login after successful registration
+      setTimeout(() => {
+        router.push('/login')
+      }, 2000)
 
-          const result = await response.json()
-
-          if (!response.ok || !result.success) {
-            console.error('Profile creation error:', result)
-            setError('Account created but profile setup failed. Please try logging in.')
-            return
-          }
-
-          console.log('User profile created successfully:', result)
-
-          // Check if email confirmation is required
-          if (data.user.email_confirmed_at) {
-            router.push('/dashboard')
-          } else {
-            setError('Please check your email and click the confirmation link')
-          }
-        } catch (profileErr) {
-          console.error('Profile creation error:', profileErr)
-          setError('Account created but profile setup failed. Please try logging in.')
-        }
-      }
     } catch (err) {
       setError('An unexpected error occurred')
     } finally {
@@ -130,12 +110,15 @@ export default function RegisterPage() {
             {error && (
               <div className="text-red-500 text-sm">{error}</div>
             )}
+            {success && (
+              <div className="text-green-500 text-sm">Account created successfully! Redirecting to login...</div>
+            )}
             <Button 
               type="submit" 
               className="w-full bg-apple-blue text-white hover:bg-apple-blue/90"
-              disabled={loading}
+              disabled={loading || success}
             >
-              {loading ? 'Creating account...' : 'Create Account'}
+              {loading ? 'Creating account...' : success ? 'Account Created!' : 'Create Account'}
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">

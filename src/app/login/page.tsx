@@ -35,8 +35,6 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        // User profile should exist (created by trigger)
-        // If not, it will be created automatically
         router.push('/dashboard')
       }
     } catch (err) {

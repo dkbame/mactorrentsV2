@@ -110,7 +110,6 @@ INSERT INTO public.users (
     passkey,
     role,
     created_at,
-    updated_at,
     is_verified,
     profile_data
 ) VALUES (
@@ -119,7 +118,6 @@ INSERT INTO public.users (
     'admin',
     'ADMIN_PASSKEY_1234567890123456789012',
     'admin',
-    NOW(),
     NOW(),
     true,
     '{}'
