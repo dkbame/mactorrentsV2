@@ -37,12 +37,37 @@ export default function RegisterPage() {
       }
 
       if (data.user) {
-        // User profile will be created automatically by database trigger
-        // Check if email confirmation is required
-        if (data.user.email_confirmed_at) {
-          router.push('/dashboard')
-        } else {
-          setError('Please check your email and click the confirmation link')
+        // Create user profile manually with proper error handling
+        try {
+          const passkey = Array.from({ length: 32 }, () => 
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 62)]
+          ).join('')
+
+          const { error: profileError } = await supabase
+            .from('users')
+            .insert({
+              id: data.user.id,
+              email: data.user.email,
+              username: username || data.user.email?.split('@')[0] || 'user',
+              passkey,
+              role: 'user'
+            })
+
+          if (profileError) {
+            console.error('Profile creation error:', profileError)
+            setError('Account created but profile setup failed. Please try logging in.')
+            return
+          }
+
+          // Check if email confirmation is required
+          if (data.user.email_confirmed_at) {
+            router.push('/dashboard')
+          } else {
+            setError('Please check your email and click the confirmation link')
+          }
+        } catch (profileErr) {
+          console.error('Profile creation error:', profileErr)
+          setError('Account created but profile setup failed. Please try logging in.')
         }
       }
     } catch (err) {
