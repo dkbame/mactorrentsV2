@@ -37,27 +37,29 @@ export default function RegisterPage() {
       }
 
       if (data.user) {
-        // Create user profile manually with proper error handling
+        // Create user profile using API endpoint
         try {
-          const passkey = Array.from({ length: 32 }, () => 
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 62)]
-          ).join('')
-
-          const { error: profileError } = await supabase
-            .from('users')
-            .insert({
-              id: data.user.id,
+          const response = await fetch('/api/create-profile', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              user_id: data.user.id,
               email: data.user.email,
-              username: username || data.user.email?.split('@')[0] || 'user',
-              passkey,
-              role: 'user'
+              username: username || data.user.email?.split('@')[0] || 'user'
             })
+          })
 
-          if (profileError) {
-            console.error('Profile creation error:', profileError)
+          const result = await response.json()
+
+          if (!response.ok || !result.success) {
+            console.error('Profile creation error:', result)
             setError('Account created but profile setup failed. Please try logging in.')
             return
           }
+
+          console.log('User profile created successfully:', result)
 
           // Check if email confirmation is required
           if (data.user.email_confirmed_at) {
