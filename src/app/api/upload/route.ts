@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { parseTorrentFile } from '@/lib/torrent'
-import { requireAuth } from '@/lib/auth'
 import { createSlug } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
   try {
     console.log('Upload API called')
-    
-    // Require authentication
-    const user = await requireAuth()
-    console.log('User authenticated:', user.username)
     
     const formData = await request.formData()
     const file = formData.get('torrent') as File
@@ -109,7 +104,7 @@ export async function POST(request: NextRequest) {
       .from('torrent-files')
       .getPublicUrl(fileName)
 
-    // Insert torrent into database with authenticated user
+    // Insert torrent into database (no auth required)
     const { data: torrent, error } = await supabase
       .from('torrents')
       .insert({
@@ -117,7 +112,7 @@ export async function POST(request: NextRequest) {
         slug,
         description: description || null,
         category_id: categoryId,
-        uploader_id: user.id, // Use authenticated user
+        uploader_name: 'Anonymous', // Simple uploader name
         info_hash: parsedTorrent.infoHash,
         file_size: parsedTorrent.totalSize,
         piece_length: parsedTorrent.pieceLength,
